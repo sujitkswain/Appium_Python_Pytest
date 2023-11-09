@@ -1,0 +1,1465 @@
+
+    <html>
+    <head>
+        
+        <title>Test Report</title>
+    
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<link rel="stylesheet" type="text/css" href="https://cdn.statically.io/gh/naveens33/ctreport-selenium/0d9f6e27/ctreport_selenium/ctreport_html/style.css" />
+		<link rel="stylesheet" type="text/css" href="https://cdn.statically.io/gh/naveens33/ctreport-selenium/5bbcc32f/ctreport_html/font/MoonIcon.css" />
+		<link rel = 'stylesheet' href = 'https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css'>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css' integrity='sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ' crossorigin='anonymous'>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+		<!--<link rel = "icon" href =  "https://cdn.statically.io/gh/naveens33/ctreport-selenium/5bbcc32f/ctreport_html/resource/logo.png" type = "image/x-icon">--> 
+		<script type = 'text/javascript'>
+		    
+    $(function(){
+			Chart.pluginService.register({
+			  beforeDraw: function(chart) {
+				var width = chart.chart.width,
+					height = chart.chart.height,
+					ctx = chart.chart.ctx,
+					type = chart.config.type;
+
+				if (type == 'doughnut')
+				{
+                    var percent = Math.round((chart.config.data.datasets[0].data[0] * 100)/
+                                            (chart.config.data.datasets[0].data[0]+
+                                            chart.config.data.datasets[0].data[1]+
+                                            chart.config.data.datasets[0].data[2]+
+                                            chart.config.data.datasets[0].data[3]));
+						var oldFill = ctx.fillStyle;
+				  var fontSize = ((height - chart.chartArea.top) / 100).toFixed(2);
+				  
+				  ctx.restore();
+				  ctx.font = fontSize + "em sans-serif";
+				  ctx.textBaseline = "middle"
+
+				  var text = percent + "%",
+					  textX = Math.round((width - ctx.measureText(text).width-100) / 2),
+					  textY = (height + chart.chartArea.top) / 2;
+						
+				  ctx.fillStyle = chart.config.data.datasets[0].backgroundColor[0];
+				  ctx.fillText(text, textX, textY);
+				  ctx.fillStyle = oldFill;
+				  ctx.save();
+				}
+			  }
+			});
+
+		var statuschart = new Chart(document.getElementById('statuschart'), {
+		  type: 'doughnut',
+		  data: {
+					labels: ["Passed", "Failed", "Skipped","Broken"],
+					datasets: [{
+						label: "Population (millions)",
+						backgroundColor: ["#00AF00", "#F7464A","#1E90FF","#aaa"],
+						  data: [2,0,0,0],
+					}]	
+				},
+		  options: {
+								responsive: true,
+								cutoutPercentage: 80,
+								title: {
+									display: false,
+									text: 'Status'
+								  },
+								legend: {
+									position:'right',
+								},
+								onClick:function(e){
+									try {
+										var dict = {
+										  0: "passed",
+										  1: "failed",
+										  2: "skipped",
+										  3: "broken",
+										};
+										var activePoints = statuschart.getElementsAtEvent(e);
+										var selectedIndex = activePoints[0]._index;
+										var status=selectedIndex;
+										display_other_page();
+										filterSelection(dict[status]);
+									}
+									catch(err) {}
+								}
+							},
+					});
+
+				});
+    
+            window.onload = function() {
+                
+        var dict= {'#1': 'Home Page Verification Test for GS', '#2': 'Product Page Verification Test for GS'}
+        var timelinechart = new Chart(document.getElementById("timelinechart"), {
+            type: 'line',
+            data: {
+                labels: ['#1', '#2'],
+                datasets: [
+                    {
+                        backgroundColor:"rgba(188, 216, 249,0.4)",
+                        borderColor:"rgb(188, 216, 249)",
+                        pointBackgroundColor: "rgba(188, 216, 249,0.6)",
+                        pointBorderColor: "#000000",
+                        pointStyle:"crossRot",
+                        showLine:true,
+                        data: [8.0, 4.0],
+                        lineTension:0,
+                    },
+                ]
+            },
+            options: {
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            var label ='';
+                            label += Math.round(tooltipItem.yLabel * 100) / 100;
+                            label +=' sec';
+                            return label;
+                        },
+                        title: function(tooltipItem, data) {
+                            var title ='';
+                            title += dict[tooltipItem[0].xLabel];
+                            return title;
+                        }
+                    }
+                },
+                onClick: function(evt,i) {
+                    var activePoint = timelinechart.getElementAtEvent(evt)[0];
+                    var data = activePoint._chart.data;
+                    var datasetIndex = activePoint._datasetIndex;
+                    var value = this.data.datasets[datasetIndex].data[activePoint._index];
+                    e = i[0];
+                    var id = this.data.labels[e._index];
+                    console.log(id);
+                    display_other_page();
+                    filterSelection("all");
+                    document.getElementById(id).scrollIntoView();
+                }
+            },
+            
+        });
+    
+                    
+        var prioritychart=new Chart(document.getElementById("prioritychart"), {
+        type: 'bar',
+        data: {
+            labels: ["High", "Medium", "Low"],
+            datasets: [{
+                label: "Passed",
+                backgroundColor: "#00AF00",
+                data: [2, 0, 0]
+            }, {
+                label: "Failed",
+                backgroundColor: "#F7464A",
+                data: [0, 0, 0]
+            },{
+                label: "Skipped",
+                backgroundColor: "#1E90FF",
+                data: [0, 0, 0]
+            },{
+                label: "Broken",
+                backgroundColor: "#aaa",
+                data: [0, 0, 0]
+            }
+            ]
+        },
+        options: {
+            title: {
+                fontSize:20,
+                display: false,
+                text: 'Group under Priority'
+            },
+            legend: {
+                position:'bottom'
+            },
+            scales: {
+                xAxes: [{
+                    barThickness : 25,
+                    barPercentage: 169,			
+                }],
+                yAxes: [{
+                    display: true,
+                    ticks: {
+                        display: false,
+                        maxTicksLimit: 6,
+                        precision:0,
+                    }
+                }],
+            }
+        }
+    });
+    
+                    
+        new Chart(document.getElementById("assertionchart"), {
+        type: 'bar',
+        data: {
+          labels: ["Blocker"],
+          datasets: [
+            {
+              label: "Passed",
+              backgroundColor: "#00AF00",
+              data: [2]
+            }, {
+              label: "Failed",
+              backgroundColor: "#F7464A",
+              data: [0]
+            }
+          ]},
+        options: {
+          title: {
+            fontSize:20,
+            display: false,
+            text: 'Group under Priority'
+          },
+          legend: {
+            position:'bottom'
+          },
+          scales: {
+            xAxes: [{
+                barThickness : 40,
+                barPercentage: 19,			
+            }],
+            yAxes: [{
+                display: true,
+                ticks: {
+                    display: false,
+                    maxTicksLimit: 6,
+                    precision:0,
+				}
+            }],
+          }
+        }
+    });
+    
+                    
+            new Chart(document.getElementById("verificationchart"), {
+            type: 'bar',
+            data: {
+              labels: ['Blocker', 'Critical', 'Major', 'Minor'],
+              datasets: [
+                {
+                  label: "Passed",
+                  backgroundColor: "#00AF00",
+                  data: [0, 0, 0]
+                }, {
+                  label: "Failed",
+                  backgroundColor: "#F7464A",
+                  data: [0, 0, 0]
+                }
+              ]},
+            options: {
+              title: {
+                fontSize:20,
+                display: false,
+                text: 'Group under Priority'
+              },
+              legend: {
+                position:'bottom'
+              },
+              scales: {
+                xAxes: [{
+                    barThickness : 40,
+                    barPercentage: 19,			
+                }],
+                yAxes: [{
+                    display: true,
+                    ticks: {
+                        display: false,
+                        maxTicksLimit: 6,
+                        precision:0,
+    				}
+                }],
+              }
+            }
+        });
+        
+            };
+        </script>
+		
+    <script>
+        function display_other_page() {
+          var x = document.getElementById("testdetails");
+          if (x.style.display === "none") {
+            x.style.display = "block";
+          } else {
+            x.style.display = "none";
+          }
+          var x = document.getElementById("test-view");
+          if (x.style.display === "none") {
+            x.style.display = "block";
+          } else {
+            x.style.display = "none";
+          }
+          var x = document.getElementById("graph");
+          if (x.style.display === "none") {
+            x.style.display = "block";
+          } else {
+            x.style.display = "none";
+          }
+          var x = document.getElementById("dashboard");
+          if (x.style.display === "none") {
+            x.style.display = "block";
+          } else {
+            x.style.display = "none";
+          }
+        }		
+    </script>
+
+		
+    <script>
+        function filterSelection(c) {
+            toast_message(c)
+            var x, i;
+            x = document.getElementsByClassName("filterDiv");
+            x1 = document.getElementsByClassName("filterDiv1");
+            x2 = document.getElementsByClassName("NoTest");
+            if (c == "all") {
+                y = document.getElementsByClassName("passicon");
+                w3RemoveClass(y[0], "fa fa-check");
+                w3AddClass(y[0], "fa fa-check-circle");
+                y = document.getElementsByClassName("failicon");
+                w3RemoveClass(y[0], "fa fa-times");
+                w3AddClass(y[0], "fa fa-times-circle");
+                y = document.getElementsByClassName("skipicon");
+                w3RemoveClass(y[0], "fa fa-minus");
+                w3AddClass(y[0], "fa fa-minus-circle");
+                y = document.getElementsByClassName("brokenicon");
+                w3RemoveClass(y[0], "fa fa-exclamation");
+                w3AddClass(y[0], "fa fa-exclamation-circle");
+                for (i = 0; i < x.length; i++) { 
+                    if (x[i].className.indexOf(c) > -1 || x1[i].className.indexOf(c) > -1){}
+                    else
+                     {
+                        w3RemoveClass(x[i], "hide");
+                        w3RemoveClass(x1[i], "hide");
+                     }
+                }
+                w3RemoveClass(x2[0], "table_show");
+				w3AddClass(x2[0], "hide");
+            }
+            if(c=="passed"){
+                y = document.getElementsByClassName("passicon");
+                w3RemoveClass(y[0], "fa fa-check-circle");
+                w3AddClass(y[0], "fa fa-check");
+                y = document.getElementsByClassName("failicon");
+                w3RemoveClass(y[0], "fa fa-times");
+                w3AddClass(y[0], "fa fa-times-circle");
+                y = document.getElementsByClassName("skipicon");
+                w3RemoveClass(y[0], "fa fa-minus");
+                w3AddClass(y[0], "fa fa-minus-circle");
+                y = document.getElementsByClassName("brokenicon");
+                w3RemoveClass(y[0], "fa fa-exclamation");
+                w3AddClass(y[0], "fa fa-exclamation-circle");
+                no_of_tr=0;
+                for (i = 0; i < x.length; i++) { 
+                    if (x[i].className.indexOf(c) > -1 || x1[i].className.indexOf(c) > -1)
+                     {
+                     no_of_tr++;
+                        w3RemoveClass(x[i], "hide");
+                        w3AddClass(x[i], "table_show");
+                        w3RemoveClass(x1[i], "hide");
+                        w3AddClass(x1[i], "custom_show");
+                     }
+                    else
+                     {
+                         w3RemoveClass(x[i], "table_show");
+                         w3AddClass(x[i], "hide");
+                         w3RemoveClass(x1[i], "custom_show");
+                         w3AddClass(x1[i], "hide");
+                     }
+                }
+                if(no_of_tr==0)
+				{
+					w3RemoveClass(x2[0], "hide");
+						 w3AddClass(x2[0], "table_show");
+				}
+				else{
+					w3RemoveClass(x2[0], "table_show");
+						 w3AddClass(x2[0], "hide");
+				
+				}
+            }
+            if(c=="failed"){
+                y = document.getElementsByClassName("passicon");
+                w3RemoveClass(y[0], "fa fa-check");
+                w3AddClass(y[0], "fa fa-check-circle");
+                y = document.getElementsByClassName("failicon");
+                w3RemoveClass(y[0], "fa fa-times-circle");
+                w3AddClass(y[0], "fa fa-times");
+                y = document.getElementsByClassName("skipicon");
+                w3RemoveClass(y[0], "fa fa-minus");
+                w3AddClass(y[0], "fa fa-minus-circle");
+                y = document.getElementsByClassName("brokenicon");
+                w3RemoveClass(y[0], "fa fa-exclamation");
+                w3AddClass(y[0], "fa fa-exclamation-circle");
+                no_of_tr=0;
+                for (i = 0; i < x.length; i++) { 
+                
+                if (x[i].className.indexOf(c) > -1 || x1[i].className.indexOf(c) > -1)
+                 {
+                 no_of_tr++;
+                     w3RemoveClass(x[i], "hide");
+                     w3AddClass(x[i], "table_show");
+                     w3RemoveClass(x1[i], "hide");
+                     w3AddClass(x1[i], "custom_show");
+
+                 }
+                else
+                 {
+                    w3RemoveClass(x[i], "table_show");
+                    w3AddClass(x[i], "hide");
+                    w3RemoveClass(x1[i], "custom_show");
+                    w3AddClass(x1[i], "hide");                    
+                 }
+                }
+                if(no_of_tr==0)
+				{
+					w3RemoveClass(x2[0], "hide");
+						 w3AddClass(x2[0], "table_show");
+				}
+				else{
+					w3RemoveClass(x2[0], "table_show");
+						 w3AddClass(x2[0], "hide");
+				
+				}
+                }
+                if(c=="skipped"){
+                y = document.getElementsByClassName("passicon");
+                w3RemoveClass(y[0], "fa fa-check");
+                w3AddClass(y[0], "fa fa-check-circle");
+                y = document.getElementsByClassName("failicon");	
+                w3RemoveClass(y[0], "fa fa-times");
+                w3AddClass(y[0], "fa fa-times-circle");
+                y = document.getElementsByClassName("skipicon");
+                w3RemoveClass(y[0], "fa fa-minus-circle");
+                w3AddClass(y[0], "fa fa-minus");
+                y = document.getElementsByClassName("brokenicon");
+                w3RemoveClass(y[0], "fa fa-exclamation");
+                w3AddClass(y[0], "fa fa-exclamation-circle");
+                no_of_tr=0;
+                for (i = 0; i < x.length; i++) { 
+                
+                    if (x[i].className.indexOf(c) > -1 || x1[i].className.indexOf(c) > -1)
+                     {
+                     no_of_tr++;
+                         w3RemoveClass(x[i], "hide");
+                         w3AddClass(x[i], "table_show");
+                         w3RemoveClass(x1[i], "hide");
+                         w3AddClass(x1[i], "custom_show");
+                     }
+                    else
+                     {
+                        w3RemoveClass(x[i], "table_show");
+                        w3AddClass(x[i], "hide");
+                        w3RemoveClass(x1[i], "custom_show");
+                        w3AddClass(x1[i], "hide");
+                     }
+                }
+                if(no_of_tr==0)
+				{
+					w3RemoveClass(x2[0], "hide");
+						 w3AddClass(x2[0], "table_show");
+				}
+				else{
+					w3RemoveClass(x2[0], "table_show");
+						 w3AddClass(x2[0], "hide");
+				
+				}
+            }
+            if(c=="broken"){
+                y = document.getElementsByClassName("passicon");
+                w3RemoveClass(y[0], "fa fa-check");
+                w3AddClass(y[0], "fa fa-check-circle");
+                y = document.getElementsByClassName("failicon");	
+                w3RemoveClass(y[0], "fa fa-times");
+                w3AddClass(y[0], "fa fa-times-circle");
+                y = document.getElementsByClassName("skipicon");
+                w3RemoveClass(y[0], "fa fa-minus");
+                w3AddClass(y[0], "fa fa-minus-circle");
+                y = document.getElementsByClassName("brokenicon");
+                w3RemoveClass(y[0], "fa fa-exclamation-circle");
+                w3AddClass(y[0], "fa fa-exclamation");
+                no_of_tr=0;
+                for (i = 0; i < x.length; i++) { 
+                    if (x[i].className.indexOf(c) > -1 || x1[i].className.indexOf(c) > -1)
+                     {
+                     no_of_tr++;
+                        w3RemoveClass(x[i], "hide");
+                        w3AddClass(x[i], "table_show");
+                        w3RemoveClass(x1[i], "hide");
+                        w3AddClass(x1[i], "custom_show");
+                     }
+                    else
+                     {
+                        w3RemoveClass(x[i], "table_show");
+                        w3AddClass(x[i], "hide");
+                        w3RemoveClass(x1[i], "custom_show");
+                        w3AddClass(x1[i], "hide");
+                     }
+                }
+                if(no_of_tr==0)
+				{
+					w3RemoveClass(x2[0], "hide");
+						 w3AddClass(x2[0], "table_show");
+				}
+				else{
+					w3RemoveClass(x2[0], "table_show");
+						 w3AddClass(x2[0], "hide");
+				
+				}
+            }
+        }
+        
+        function w3AddClass(element, name) {
+            var i, arr1, arr2;
+            arr1 = element.className.split(" ");
+            arr2 = name.split(" ");
+            for (i = 0; i < arr2.length; i++) {
+                if (arr1.indexOf(arr2[i]) == -1) {
+                    element.className += " " + arr2[i];
+                }
+            }
+        }
+        
+        function w3RemoveClass(element, name) {
+            var i, arr1, arr2;
+            arr1 = element.className.split(" ");
+            arr2 = name.split(" ");
+            for (i = 0; i < arr2.length; i++) {
+                while (arr1.indexOf(arr2[i]) > -1) {
+                  arr1.splice(arr1.indexOf(arr2[i]), 1);     
+                }
+            }
+            element.className = arr1.join(" ");
+        }
+    </script>
+    
+		
+    <script>
+    function showFooter(){
+            footer=document.getElementById("footer");
+            w3RemoveClass(footer, "hide");
+            w3AddClass(footer, "show");
+            var elmnt = document.getElementById("reference");
+            elmnt.scrollIntoView();	
+        }
+        function hideFooter(){
+            footer=document.getElementById("footer");
+            w3RemoveClass(footer, "show");
+            w3AddClass(footer, "hide");
+        }
+        function expandFooter(frm){
+            footer=document.getElementById("footer");
+            h5=document.getElementById("reference");
+            i=h5.querySelector("i");
+            if(frm=="info")
+            {
+                showFooter();
+                w3RemoveClass(i, "fas fa-caret-right");
+                w3AddClass(i, "fas fa-caret-down");
+            }
+            else{
+                if (i.className.includes("fas fa-caret-right")){
+                    showFooter();
+                    w3RemoveClass(i, "fas fa-caret-right");
+                    w3AddClass(i, "fas fa-caret-down");
+                }
+                else{
+                    hideFooter();
+                    w3RemoveClass(i, "fas fa-caret-down");
+                    w3AddClass(i, "fas fa-caret-right");
+                }
+            }
+
+        }
+        function expandFunction(id){
+            div = document.getElementById(id);
+            i = div.querySelector("#expand")
+            if (i.className.includes("fas fa-caret-square-down"))
+            {
+                w3RemoveClass(i, "fas fa-caret-square-down");
+                w3AddClass(i, "fas fa-caret-square-up");
+            }
+            else{
+                    w3RemoveClass(i, "fas fa-caret-square-up");
+                    w3AddClass(i, "fas fa-caret-square-down");
+            }
+        }
+    </script>
+    
+        
+    <script>
+    function myFunction() {
+        var input, search_term,tbody,tr,span,test_id,test_name;
+        var div1,div2,li1,span1,test_id1,test_name1;
+        input = document.getElementById("myInput");
+        search_term = input.value.toUpperCase();
+        //console.log("search_term: "+search_term);
+        tbody=document.getElementById("search1");
+        tr=tbody.getElementsByTagName("tr");
+        div1=document.querySelectorAll("div#search2>div");
+        //console.log("no of div2: "+div2.length);
+        for (i = 0; i < tr.length-1; i++) {
+            span=tr[i].querySelectorAll("td span:nth-child(1)");
+            if(span)
+            {
+                id=span[0].textContent;
+                test_name=span[1].textContent;
+                if((test_name.toUpperCase().indexOf(search_term)>-1)
+                ||(id.toUpperCase().indexOf(search_term)>-1)){
+                    //console.log(test_name);
+                    tr[i].style.display = "";
+                }
+                else{
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+        for (i = 0; i < div1.length; i++) {
+            span=div1[i].querySelectorAll("ul>li:nth-child(1) span");
+            if(span)
+            {
+                id=span[0].innerHTML.split(" ")[0];
+                test_name=span[0].innerHTML;
+                if((test_name.toUpperCase().indexOf(search_term)>-1)
+                ||(id.toUpperCase().indexOf(search_term)>-1)){
+                    div1[i].style.display = "";
+                }
+                else{
+                    div1[i].style.display = "none";
+                }
+            }
+        }
+    }
+    </script>
+    
+        
+    <script>
+        $(document).ready(function(){
+          $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+    
+        
+    <script>
+        function createmodal(id) {
+           var tests = {}
+            var content = '<table class="table table-bordered ">';
+            var footer = ''
+            if(Array.isArray(tests[id])){
+                content += '<tbody>                            <tr class="table-secondary"><td>Expected</td></tr>                            <tr class="align-middle">';
+                
+                content += '<td>'+tests[id][0].join(", ")+'</td></tr>                            <tr class="table-secondary"><td>Actual</td></tr>                            <tr class="align-middle">';
+                
+                content += '<td>'+tests[id][1].join(", ")+'</td></tr>';
+            }
+            else{
+                content += '<thead class="thead-light">                              <tr>                                <th class="align-middle text-sm-center">Status</th>                                <th class="align-middle text-sm-center">Key</th>                                <th class="align-middle text-sm-center">Expected</th>                                <th class="align-middle text-sm-center">Actual</th>                              </tr>                            </thead>                            <tbody>';
+                            
+                for(var key in tests[id]) {
+                    status =''
+                    key_='<td>'+key+'</td>'
+                    expected='<td>'+tests[id][key][0]+'</td>';
+                    actual='<td>'+tests[id][key][1]+'</td>';
+                    if (tests[id][key][2]=='true'){
+                        status='<i class="fa fa-check-circle align-middle text-sm-center" style="color:#00AF00; font-size: 18px;"></i>';
+                    }
+                    else{
+                        status='<i class="fa-times-circle fa align-middle text-sm-center" style="color:#F7464A; font-size: 18px;"></i>';
+                        if (tests[id][key][0]=="null"){
+                            key_ = '<td style="background-color:rgb(247, 131, 134,0.3);">'+key+'</td>'
+                            expected='<td></td>';
+                        }
+                        else if(tests[id][key][1]=="null"){
+                            actual='<td style="color:#F7464A;">                            <i class="fas fa-ban"   data-toggle="tooltip" data-placement="right" data-original-title="Key missing in actual data"></i>                            </td>';
+                        }
+                        else{
+                            actual='<td style="background-color: #ffffb2">'+tests[id][key][1]+'</td>';
+                        }
+                    }
+                    content += '<tr class="align-middle text-sm-center">                            <td>                            '+status+'                            </td>                            '+key_+'                            '+expected+'                            '+actual+'                          </tr>';
+                footer = '<div class="row">                            <div class="col-2"><i class="fas fa-square-full border border-secondary" style="color: #ffffb2"></i></div>                            <div class="col-10">\Actual is not same as Expected</div>                            </div>                            <div class="row">                            <div class="col-2"><i class="fas fa-square-full border border-secondary" style="color:rgb(247, 131, 134,0.3);"></i></div>                            <div class="col-10">New key found in actual</div>                            </div>                            <div class="row">                            <div class="col-2"><i class="fas fa-ban" style="color:#F7464A;"></i></div>                            <div class="col-10">Key missing in actual data</div>                        </div>';
+                }  
+            }
+            content += '</tbody>            </table>';
+            
+            var header = "Expected vs Actual";
+            
+            var html = '<div id="modalWindow" class="modal" data-keyboard="false" data-backdrop="static">';
+            html += '<div class="modal-dialog modal-dialog-scrollable ">            <div class="modal-content">            <div class="modal-header">            <button type="button" id="closeModal" class="btn btn-danger" data-dismiss="modal" onclick=deletemodal("modalWindow") style="margin:auto 1rem auto auto; font-size: smaller;">Close</button>            </div>            <div class="modal-body">'
+            +content+'            </div>            <div class="modal-footer small">'            +footer+'            </div>            </div>            </div>            </div>';
+            $("#myModal").html(html);
+            $("#modalWindow").modal();
+        }
+        function deletemodal(id) {
+            var element = document.getElementById(id);
+            element.parentNode.removeChild(element);
+        };
+    </script>
+    
+        
+    <script>
+        function createimagemodal(path,cap) {
+            var html = '<div id="modalWindow1" class="modal" data-keyboard="false" data-backdrop="static">                        <span class="close1" onclick=deletemodal("modalWindow1") data-dismiss="modal">&times;</span>                        <img class="modal-content" id="img01" style="max-height: -webkit-fill-available; width: auto;"></img>                        <div id="caption"></div>                        </div>';
+            $("#imagemodal").html(html);
+            $("#modalWindow1").modal();
+            var modalImg = document.getElementById("img01");
+            var captionText = document.getElementById("caption");
+            modalImg.src = path;
+            captionText.innerHTML = cap;
+        }
+    </script>
+    
+        
+<script>
+		function toast_message(status) {
+		
+			toastr.options = {
+				"closeButton": false,
+				"debug": false,
+				"newestOnTop": false,
+				"progressBar": false,
+				"positionClass": "toast-bottom-right",
+				"preventDuplicates": false,
+				"onclick": null,
+				"showDuration": "300",
+				"hideDuration": "400",
+				"timeOut": "5000",
+				"extendedTimeOut": "1000",
+				"showEasing": "swing",
+				"hideEasing": "linear",
+				"showMethod": "fadeIn",
+				"hideMethod": "fadeOut"
+			};
+			if(status=="all")
+			{
+				toastr["info"]("Filter Removed");
+			}
+			else{
+			toastr["info"]("Filtered "+status.replace(/^./, status[0].toUpperCase())+" Test Cases");
+			}
+		};
+	</script>
+
+		<style>
+		span.extrasmall{
+			font-size: 10px;
+			}
+		.table_show {
+			display: table-row;
+		}     
+		.custom_show {
+			display: block;
+		}       
+		.hide{
+			display: none;
+		}       
+        </style>
+    
+    <body class="ash">
+        <!--<button onclick='topFunction()' id='myBtn' title='Go to top'>Top</button>-->
+        <!-- NAVBAR -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white" style="padding:0px">
+            <div class="container-fluid">
+				<!-- logo -->
+				<div class="Logo-Search" style="padding: 6px 0;">
+					
+            <a class="navbar-brand disabled">
+    						<img  class="img-fluid" src="https://cdn.statically.io/gh/naveens33/ctreport-selenium/9a6cfed9/ctreport_selenium/ctreport_html/resource/logo-nobg.png" style="height: 25px;">
+    					</a>
+            
+                    <div style="margin-right: auto;">
+						<div class="badge badge-light" style="font-size: large; padding:8px; margin-top:5px;">
+							<span >Android Test Automation Report</span>
+						</div>
+					</div>
+					<!-- Search & Client logo -->
+					<div class="right-logos"> 
+					   <div class="search-client" >
+							<div id="graph" onclick="display_other_page()" class="cursor-pointer" style="display: none; padding-right:20px; margin-top:6px;" data-toggle="tooltip" data-placement="bottom" title="Click to toggle dashboard">
+								<i class="fa fa-bar-chart" style="font-size:30px; color:#808080;"></i>
+							</div>
+							<div id="testdetails" class="cursor-pointer" style="padding-right:20px; margin-top:6px;" onclick="display_other_page()" data-toggle="tooltip" data-placement="bottom" title="Click to toggle test details">
+								<i class="fas fa-tasks" style="font-size:30px; color:#808080;"></i>
+							</div>
+							<a class="navbar-brand disabled">
+								
+							</a>					
+						</div>
+					</div>
+               </div> 
+              </div>
+        </nav>
+		
+    <!--Dashboard-->
+    <div id="dashboard" class="wrapper">
+			<div class="container-fluid">
+				<section  class="pading">
+                    <div class="row mt-3">
+						<div class="col-sm-12 col-lg-8">
+							<div class="chart p-2 p-md-4 ">
+								<span class="badge badge-secondary pointer" data-toggle="tooltip" data-placement="right" title="Execution timeline of each test">Timeline</span>
+								<br/>
+								<br/>
+								<p class="text-center pb-4 "><b>0:00:12(H:MM:SS)</b> Overall Duration, <b>2</b> total test(s)</p>
+								<canvas id="timelinechart" width="550" height="156" ></canvas>
+							</div>
+                        </div>
+                        <div class="col-sm-12 col-lg-4">
+                            <div class="chart p-2 p-md-4">
+								<span class="badge badge-secondary pointer"  data-toggle="tooltip" data-placement="right" title="Test execution status breakdown">Status</span>
+								<!--<br/>
+								<br/>-->
+								<p class="text-center pb-0 pb-md-1 pb-sm-1 pb-lg-1 "> <b>2</b> test(s) passed, <b>0</b> failed, <b>0</b> skipped, <b>0</b> broken</p>   
+                                <canvas id="statuschart" height="187" ></canvas>
+							</div>
+                        </div>
+                    </div>
+				</section>
+				<section  class="pading">
+                    <div class="row mt-3">
+						<div class="col-sm-12 col-lg-4">
+							<div class="chart p-2 p-md-4 ">
+								<span class="badge badge-secondary pointer"  data-toggle="tooltip" data-placement="right" title="Test execution status breakdown on Priority of test cases">Priority</span>
+								<br/>
+								<br/>
+                                <p class="text-center  pb-0 pb-md-2 pb-sm-2 pb-lg-4 "> <b>2</b> total test(s)</p>
+                                <canvas id="prioritychart" height="187" ></canvas>
+							</div>
+                        </div>
+                        <div class="col-sm-12 col-lg-4">
+                            <div class="chart p-2 p-md-4">
+								<span class="badge badge-secondary pointer" data-toggle="tooltip" data-placement="right" title="Assertion status breakdown">Assertion</span>
+								<br/>
+								<br/>
+								<p class="text-center pb-0 pb-md-2 pb-sm-2 pb-lg-4 "> <b>2</b> assertion(s) passed, <b>0</b> assertion(s) failed</p>   
+                                <canvas id="assertionchart" height="187" ></canvas>
+                            </div>
+                        </div>
+						<div class="col-sm-12 col-lg-4">
+                            <div class="chart p-2 p-md-4">
+								<span class="badge badge-secondary pointer" data-toggle="tooltip" data-placement="right" title="Verification status breakdown on Severity of verification steps">Verifications</span>
+								<br/>
+								<br/>
+								<p class="text-center pb-0 pb-md-2 pb-sm-2 pb-lg-4 "> <b>0</b> verification(s) passed, <b>0</b> verification(s) failed</p>   
+                                <canvas id="verificationchart" height="187" ></canvas>
+                            </div>
+                        </div>
+                    </div>
+				</section>
+				<!-- CARD -->
+				<section  class="pading">
+					<div class="row mt-1">
+					<!--Details-->
+						<div class="col-md-12 col-lg-6">
+							<div class="row mt-3 ">
+								<div class="col-md-3 col-lg-12 ">
+									<div class="box-table">
+										<table class="table table_ text-uppercase">
+											<tbody>
+                                                
+                       <tr>
+                           <td>owner</td>
+                           <td>Sujit Swain</td>
+                       </tr>
+                   
+                       <tr>
+                           <td>application_name</td>
+                           <td>GS ANDRIOD APP</td>
+                       </tr>
+                   
+                       <tr>
+                           <td>application_version</td>
+                           <td>BUILD V0.1</td>
+                       </tr>
+                   
+                       <tr>
+                           <td>platform</td>
+                           <td>Android</td>
+                       </tr>
+                   
+                       <tr>
+                           <td>additional_information</td>
+                           <td>Device details : Vivo V9</td>
+                       </tr>
+                   
+                       <tr>
+                           <td>description</td>
+                           <td>General Store App for all Customers</td>
+                       </tr>
+                   
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-12 col-lg-6">
+							<div class="row mt-3">
+								<div class="col-md-3 col-lg-6">
+									<div class="box">
+										<div class="row">
+											<div class=" col-6 col-lg-6">
+												<h6 class="text-center" style="  background-color: #F1646C;">Test</h6>
+											</div>
+											<div class=" text-right col-6 col-lg-6">
+												<span class="icon-flask pr-3"></span>
+											</div>
+											<p class="pl-3">2</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 col-lg-6">
+									<div class="box">
+										<div class="row">
+											<div class="col-md-6 col-6">
+												<h6 class="text-center"  style="  background-color: #1ECAB8;">Duration</h6>
+											</div>
+											<div class="col-md-6 col-6 text-right">
+												<span class="icon-stopwatch"></span>
+											</div>
+											<p class="pl-3">0:00:12(H:MM:SS)</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row mt-3">
+								<div class="col-md-3 col-lg-6">
+									<div class="box">
+										<div class="row">
+											<div class="col-md-6 col-6">
+												<h6 class="text-center"  style="  background-color: #4AC7EC;">Start</h6>
+											</div>
+											<div class="col-md-6 col-6 text-right">
+												<span class="icon-clock"></span>
+											</div>
+											<p class="pl-3">09-11-23 17:02:15</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-3 col-lg-6">
+									<div class="box">
+										<div class="row">
+											<div class="col-md-6 col-6">
+												<h6 class="text-center"  style="  background-color: #F3C74D;">End</h6>
+											</div>
+											<div class="col-md-6 col-6 text-right">
+												<span class="icon-alarm-clock"></span>
+											</div>
+											<p class="pl-3">09-11-23 17:02:27</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<br/>
+				<br/>
+			</div>
+		</div>
+    
+		
+        <div id="test-view" class="wrapper" style="display: none;">
+        <div class="container-fluid">
+            <section class="pading">
+                <div class="row  mt-3">
+                    <!--test summary-->
+                    
+    <!--Summary table-->
+    <div class="col-sm-12 col-lg-5">
+        <nav class=" p-2 test_details p-md-4">
+            
+    <div style="display:flex">
+        <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search by #id or name..." style="font-size:15px; max-height:32px; max-width:100%;">
+        <div id="myBtnContainer" style="margin-left: auto;">
+            <span class="font-weight-normal small" style="padding-right:15px">Filter By:</span>
+            <i class="fa fa-sync-alt pointer" style="font-size: 18px; color:#696969" onclick="filterSelection('all')" data-toggle="tooltip" data-placement="top" title="Show all(2)"></i>
+            <i class="fa fa-check-circle passicon pointer" style="color:#00AF00; font-size: 18px;" onclick="filterSelection('passed')" data-toggle="tooltip" data-placement="top" title="Passed(2)"></i>
+            <i class="fa fa-times-circle failicon pointer" style="color:#F7464A; font-size: 18px;" onclick="filterSelection('failed')" data-toggle="tooltip" data-placement="top" title="Failed(0)"></i>
+            <i class="fa fa-minus-circle skipicon pointer" style="color:#1E90FF; font-size: 18px;" onclick="filterSelection('skipped')" data-toggle="tooltip" data-placement="top" title="Skipped(0)"></i>
+            <i class="fa fa-exclamation-circle brokenicon pointer" style="color:#aaa; font-size: 18px;" onclick="filterSelection('broken')" data-toggle="tooltip" data-placement="top" title="Broken(0)"></i>
+        </div>
+    </div>
+    
+            
+        <table class="table table-borderless table-hover " style="font-size: 15px;">
+        <thead>
+          <tr class="text-sm-center border-bottom">
+            <th>
+                Status
+                
+                
+        <i class="fas fa-info-circle text-info small pointer " onclick="expandFooter('info')"></i>
+    
+            </th>
+            <th>
+                Priority
+                
+                
+        <i class="fas fa-info-circle text-info small pointer " onclick="expandFooter('info')"></i>
+    
+            </th>
+            <th>ID</th>
+            <th>Summary</th>
+          </tr>
+        </thead>
+        <tbody id="search1">											
+            
+            <tr class="filterDiv passed border-bottom" onclick="window.location='##1'">
+                <td class="align-middle text-sm-center">
+                    <i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px;"></i>
+                </td>
+                <td class="align-middle text-sm-center">
+                    <i class="fas fa-angle-double-up p-high" style="color: #cb3434; font-size: 18px;"></i>
+                    <span style="display: none">High</span>
+                </td>
+                <td class="align-middle text-sm-center">
+                <span>#1</span>
+                </td>
+                <td class="align-middle cut-text">
+                    <span title="Home Page Verification Test for GS">Home Page Verification Test for GS</span>
+                    </td>
+            </tr>
+        
+            <tr class="filterDiv passed border-bottom" onclick="window.location='##2'">
+                <td class="align-middle text-sm-center">
+                    <i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px;"></i>
+                </td>
+                <td class="align-middle text-sm-center">
+                    <i class="fas fa-angle-double-up p-high" style="color: #cb3434; font-size: 18px;"></i>
+                    <span style="display: none">High</span>
+                </td>
+                <td class="align-middle text-sm-center">
+                <span>#2</span>
+                </td>
+                <td class="align-middle cut-text">
+                    <span title="Product Page Verification Test for GS">Product Page Verification Test for GS</span>
+                    </td>
+            </tr>
+        
+    <tr class="NoTest hide border-bottom">
+                <td class="align-middle text-sm-center" colspan="4">
+                    No Test Found
+                </td>
+    </tr>
+    
+        </tbody>
+    </table>
+    
+        </nav>
+    </div>
+    
+                    <!-- test details-->
+                    
+        <div class="col-sm-12 col-lg-7">
+            <div id="search2">
+                
+        <div id="#1" class="filterDiv1 passed" style="padding-bottom: 20px;"> 
+            <ul class="list-group">
+                
+        <li class="list-group-item font-weight-bold" style="background-color:rgb(0,0,0,0.1); display: flex; justify-content: space-between;">
+            <span>#1 Home Page Verification Test for GS</span>
+            <i id="expand" class="fas fa-caret-square-down pointer" style=" font-size:x-large;" data-toggle="collapse" data-target="#moredetails0" onclick='expandFunction("#1")'></i>
+        </li>
+        
+                
+        <li id="moredetails0" class="list-group-item small panel-collapse collapse">
+            <div class="row">
+                <div class="col-5">
+                    <div class="row">
+                        <div class="col-3">Status</div>
+                        <div class="col-9">
+                        <i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px; font-size: 13px;"></i>
+                        Passed</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">Priority</div>
+                        <div class="col-9">
+                        <i class="fas fa-angle-double-up p-high" style="color: #cb3434; font-size: 18px; font-size: 13px;"></i>
+                        High</div>
+                    </div>
+                </div>
+                <div class="col-7">
+                <div class="row">
+                        <div class="col-3">Start-time</div>
+                        <div class="col-9">09-11-23 17:02:15</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">End-time</div>
+                        <div class="col-9">09-11-23 17:02:23</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">Duration</div>
+                        <div class="col-9">0:00:08(H:MM:SS)</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+            <span>Description</span>
+            <p>Home Page and Navigate to Product Page Vrification Test</p>
+            </div>
+        </li>
+        
+                
+        <li class="list-group-item">
+            <table class="table medium table-borderless table-hover">
+                <thead class="small border-bottom">
+                    <tr>
+                        <th class="text-sm-center" >STATUS</th>
+                        <th>TYPE</th>
+                        <th>DETAILS</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="small">
+                    
+                <tr class="border-bottom">
+                    <td class="text-sm-center" style="width: 10%;"><i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px;"></i></td>
+                    <td style="width: 10%;">Log</td>
+                    <td style="width: 70%;">Home Page Verification Test Started</td>
+                    <td style="width: 10%;"><span  class="extrasmall">17:02:15</span></td>
+                </tr>                
+                
+                <tr class="border-bottom">
+                    <td class="text-sm-center" style="width: 10%;"><i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px;"></i></td>
+                    <td style="width: 10%;">Log</td>
+                    <td style="width: 70%;">User sucessfully entered the name field</td>
+                    <td style="width: 10%;"><span  class="extrasmall">17:02:20</span></td>
+                </tr>                
+                
+                <tr class="border-bottom">
+                    <td class="text-sm-center" style="width: 10%;"><i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px;"></i></td>
+                    <td style="width: 10%;">Log</td>
+                    <td style="width: 70%;">User sucessfully clicked the lets shop button</td>
+                    <td style="width: 10%;"><span  class="extrasmall">17:02:21</span></td>
+                </tr>                
+                
+                    <tr class="border-bottom">
+                        <td class="text-sm-center" style="width: 10%"><i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px;"></i></td>
+                        <td style="width: 10%">Assertion</td>
+                        
+                           <td style="width: 70%">
+                           
+                               <span>Sucessfully Navigate to Product Page</span>
+                               &nbsp;
+                                <br/>
+                           
+                               <i class="fas fa-minus-circle pointer" onclick="expandFooter('info')" style="color:#a22a2a;"></i>
+                               Expected: Products    Actual: Products
+                               <br>
+                               
+                           </td>
+                       
+                        <td style="width: 10%"><span class="extrasmall">17:02:23</span></td>
+                    </tr>             
+                   
+                <tr class="border-bottom">
+                    <td class="text-sm-center" style="width: 10%;"><i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px;"></i></td>
+                    <td style="width: 10%;">Log</td>
+                    <td style="width: 70%;">Home Page Verification Test Ended</td>
+                    <td style="width: 10%;"><span  class="extrasmall">17:02:23</span></td>
+                </tr>                
+                
+                </tbody>
+            </table>
+            
+        </li>
+        
+            </ul>
+        </div>         
+        
+        <div id="#2" class="filterDiv1 passed" style="padding-bottom: 20px;"> 
+            <ul class="list-group">
+                
+        <li class="list-group-item font-weight-bold" style="background-color:rgb(0,0,0,0.1); display: flex; justify-content: space-between;">
+            <span>#2 Product Page Verification Test for GS</span>
+            <i id="expand" class="fas fa-caret-square-down pointer" style=" font-size:x-large;" data-toggle="collapse" data-target="#moredetails1" onclick='expandFunction("#2")'></i>
+        </li>
+        
+                
+        <li id="moredetails1" class="list-group-item small panel-collapse collapse">
+            <div class="row">
+                <div class="col-5">
+                    <div class="row">
+                        <div class="col-3">Status</div>
+                        <div class="col-9">
+                        <i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px; font-size: 13px;"></i>
+                        Passed</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">Priority</div>
+                        <div class="col-9">
+                        <i class="fas fa-angle-double-up p-high" style="color: #cb3434; font-size: 18px; font-size: 13px;"></i>
+                        High</div>
+                    </div>
+                </div>
+                <div class="col-7">
+                <div class="row">
+                        <div class="col-3">Start-time</div>
+                        <div class="col-9">09-11-23 17:02:23</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">End-time</div>
+                        <div class="col-9">09-11-23 17:02:27</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">Duration</div>
+                        <div class="col-9">0:00:04(H:MM:SS)</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+            <span>Description</span>
+            <p>Product Page and Navigate to Checkout Page Vrification Test</p>
+            </div>
+        </li>
+        
+                
+        <li class="list-group-item">
+            <table class="table medium table-borderless table-hover">
+                <thead class="small border-bottom">
+                    <tr>
+                        <th class="text-sm-center" >STATUS</th>
+                        <th>TYPE</th>
+                        <th>DETAILS</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="small">
+                    
+                <tr class="border-bottom">
+                    <td class="text-sm-center" style="width: 10%;"><i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px;"></i></td>
+                    <td style="width: 10%;">Log</td>
+                    <td style="width: 70%;">Product Page Verification Test Started</td>
+                    <td style="width: 10%;"><span  class="extrasmall">17:02:23</span></td>
+                </tr>                
+                
+                <tr class="border-bottom">
+                    <td class="text-sm-center" style="width: 10%;"><i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px;"></i></td>
+                    <td style="width: 10%;">Log</td>
+                    <td style="width: 70%;">First Product visible in the Product Page</td>
+                    <td style="width: 10%;"><span  class="extrasmall">17:02:24</span></td>
+                </tr>                
+                
+                <tr class="border-bottom">
+                    <td class="text-sm-center" style="width: 10%;"><i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px;"></i></td>
+                    <td style="width: 10%;">Log</td>
+                    <td style="width: 70%;">First Product add to cart sucessfully</td>
+                    <td style="width: 10%;"><span  class="extrasmall">17:02:25</span></td>
+                </tr>                
+                
+                <tr class="border-bottom">
+                    <td class="text-sm-center" style="width: 10%;"><i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px;"></i></td>
+                    <td style="width: 10%;">Log</td>
+                    <td style="width: 70%;">Cart open sucessfully</td>
+                    <td style="width: 10%;"><span  class="extrasmall">17:02:25</span></td>
+                </tr>                
+                
+                    <tr class="border-bottom">
+                        <td class="text-sm-center" style="width: 10%"><i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px;"></i></td>
+                        <td style="width: 10%">Assertion</td>
+                        
+                           <td style="width: 70%">
+                           
+                               <span>First Product Added Correctly</span>
+                               &nbsp;
+                                <br/>
+                           
+                               <i class="fas fa-minus-circle pointer" onclick="expandFooter('info')" style="color:#a22a2a;"></i>
+                               Expected: Air Jordan 4 Retro    Actual: Air Jordan 4 Retro
+                               <br>
+                               
+                           </td>
+                       
+                        <td style="width: 10%"><span class="extrasmall">17:02:27</span></td>
+                    </tr>             
+                   
+                <tr class="border-bottom">
+                    <td class="text-sm-center" style="width: 10%;"><i class="fa fa-check-circle" style="color:#00AF00; font-size: 18px;"></i></td>
+                    <td style="width: 10%;">Log</td>
+                    <td style="width: 70%;">Product Page Verification Test Ended</td>
+                    <td style="width: 10%;"><span  class="extrasmall">17:02:27</span></td>
+                </tr>                
+                
+                </tbody>
+            </table>
+            
+        </li>
+        
+            </ul>
+        </div>         
+        
+            </div>
+        </div>
+    
+                </div>
+            </section>
+        </div>
+    </div>
+    
+	    <div id="myModal"></div>
+	    <div id="imagemodal"></div>
+	    
+    <footer class="footer">
+        <div class="bg-light pl-4 p-2">
+            <span id="reference">
+            <i class="fas fa-caret-right pr-1 pointer" onclick="expandFooter('foot')" style="font-size:20px"></i>
+            Reference</span>
+        </div>
+        <section class="pading test_details">
+            <div class="row">
+                <div class=" col-sm-4 col-md col-sm-4  col-12 col">						
+                    <div id="footer" class="row hide"> 
+                        <div class="col-4 border-right">						
+                            <p class="pt2">Status: Test status after execution</p> 
+                            <div class="row">	
+                                <div class="col-3 align-self-center">
+                                <p>
+                                    <i class="fa fa-check-circle" style="color:#00AF00;"></i>
+                                Pass
+                                </p>
+                                </div>
+                                <div class="col-9">
+                                    <p class="mb10">Test case is passed without any verification/assertion/fatal errors</p>
+                                </div>
+                            </div>
+                            <div class="row">	
+                                <div class="col-3 align-self-center">
+                                <p>
+                                    <i class="fa fa-times-circle failicon" style="color:#F7464A;"></i>
+                                Fail
+                                </p>
+                                </div>
+                                <div class="col-9">
+                                    <p class="mb10">Test case is failed due to verification/assertion errors</p>
+                                </div>
+                            </div>
+                            <div class="row">	
+                                <div class="col-3 align-self-center">
+                                <p>
+                                    <i class="fa fa-minus-circle skipicon" style="color:#1E90FF;"></i>
+                                Skip
+                                </p>
+                                </div>
+                                <div class="col-9">
+                                    <p class="mb10">Test case skipped due to blocker or critical issue in dependencies</p>
+                                </div>
+                            </div>
+                            <div class="row">	
+                                <div class="col-3 align-self-center">
+                                <p>
+                                    <i class="fa fa-exclamation-circle brokenicon" style="color:#aaa"></i>
+                                Broken
+                                </p>
+                                </div>
+                                <div class="col-9">
+                                    <p class="mb10">Test case stopped due to fatal errors</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 border-right">						
+                            <p class="pt2">Priority: Applies to test case</p> 
+                            <div class="row">	
+                                <div class="col-3 align-self-center">
+                                <p>
+                                    <i class="fas fa-angle-double-up p-high" style="color: #cb3434"></i>
+                                High
+                                </p>
+                                </div>
+                                <div class="col-9">
+                                    <p class="mb10">Test case on the most important features of the application</p>
+                                </div>
+                            </div>
+                            <div class="row">	
+                                <div class="col-3 align-self-center">
+                                <p>
+                                    <i class="fas fa-equals" style="color: #ff9900"></i>
+                                Medium
+                                </p>
+                                </div>
+                                <div class="col-9">
+                                    <p class="mb10">Test case on features of the application which is next to High priority test cases</p>
+                                </div>
+                            </div>
+                            <div class="row">	
+                                <div class="col-3 align-self-center">
+                                <p>
+                                    <i class="fas fa-angle-double-down" style="color: #0099ff"></i>
+                                Low
+                                </p>
+                                </div>
+                                <div class="col-9">
+                                    <p class="mb10">Test case on features of the application which is considered to be executed rarely</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                        <p class="pt2">Severity: Applies to verification and assertion statements</p>
+                        <p class="pt2"><mark>Note: All assertions are treated as Blocker severity</mark></p> 
+                            <div class="row">	
+                                <div class="col-3 align-self-center">
+                                <p>
+                                    <i class="fas fa-minus-circle" style="color:#a22a2a;"></i>
+                                Blocker
+                                </p>
+                                </div>
+                                <div class="col-9">
+                                    <p class="mb10"> The system or functionality is currently unavailable to continue working on the application because of this incident</p>
+                                </div>
+                            </div>
+                            <div class="row">	
+                                <div class="col-3 align-self-center">
+                                <p>
+                                <i class="fa fa-exclamation-triangle" style="color:#cb3434;"></i>
+                                Critical
+                                </p>
+                                </div>
+                                <div class="col-9">
+                                    <p class="mb10">Essential functionality is not functioning and no acceptable workaround</p>
+                                </div>
+                            </div>
+                            <div class="row">	
+                                <div class="col-3 align-self-center">
+                                <p>
+                                <i class="fa fa-exclamation-circle" style="color:#ff9900;"></i>
+                                Major
+                                </p>
+                                </div>
+                                <div class="col-9">
+                                    <p class="mb10">Essential functionality is not functioning unless acceptable workaround is implemented</p>
+                                </div>
+                            </div>
+                            <div class="row">	
+                                <div class="col-3 align-self-center">
+                                <p>
+                                    <i class="far fa-circle" style="color:#0099ff;"></i>
+                                Minor
+                                </p>
+                                </div>
+                                <div class="col-9">
+                                    <p class="mb10">Minor inconvenience in the functionality and application remains operational</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        </footer>
+        <br/>
+    
+	</body>
+	</html>
+    

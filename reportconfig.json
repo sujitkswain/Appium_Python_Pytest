@@ -1,0 +1,19 @@
+{
+      "session_details" : {
+      "Owner": "Sujit Swain",
+      "application_name": "GS ANDRIOD APP",
+      "application_version": "BUILD V0.1",
+      "platform": "Android",
+      "additional_information": "Device details : Vivo V9",
+      "description": "General Store App for all Customers"
+  },
+  "report_options" :{
+      "title": "Test Report",
+      "logo": "https://cdn.statically.io/gh/naveens33/ctreport-selenium/9a6cfed9/ctreport_selenium/ctreport_html/resource/logo-nobg.png",
+      "show_reference": "True",
+      "zip_if_screenshot": "True"
+  },
+    "history" :{
+      "connection_string" : "None"
+  }
+}
